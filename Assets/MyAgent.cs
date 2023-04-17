@@ -11,21 +11,38 @@ public class MyAgent : Agent
 {
     Rigidbody rigidBody;
     public float speed = 100;
-    public Transform TargetTransform;
+    public GameObject City1;
+    public GameObject City2;
+    public GameObject City3;
+    public GameObject City4;
+    public GameObject City5;
 
     // Start is called before the first frame update
     void Start()
     {
         
     }
-
     public override void CollectObservations(VectorSensor sensor)
     {
         // The position of the agent
         sensor.AddObservation(transform.localPosition);
 
+        sensor.AddObservation(City1.transform.localPosition.x);
+        sensor.AddObservation(City1.transform.localPosition.z);
+
+        sensor.AddObservation(City2.transform.localPosition.x);
+        sensor.AddObservation(City2.transform.localPosition.z);
+
+        sensor.AddObservation(City3.transform.localPosition.x);
+        sensor.AddObservation(City3.transform.localPosition.z);
+
+        sensor.AddObservation(City4.transform.localPosition.x);
+        sensor.AddObservation(City4.transform.localPosition.z);
+
+        sensor.AddObservation(City5.transform.localPosition.x);
+        sensor.AddObservation(City5.transform.localPosition.z);
         // The position of the treasure prefab
-        //sensor.AddObservation(TargetTransform.localPosition.x);
+        //sensor.AddObservation(TargetTransform.localPosition);
         //sensor.AddObservation(TargetTransform.localPosition.y);
 
         // The distance between the agent and the treasure
@@ -35,20 +52,25 @@ public class MyAgent : Agent
     // Update is called once per frame
     public override void OnEpisodeBegin()
     {
+        var Goal = new ArrayList();
         //Debug.Log("a");
-        transform.localPosition = new Vector3(0, 0, 0);
+        //transform.localPosition = new Vector3(0, 0, 0);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
         var actionTaken = actions.ContinuousActions;
-        Debug.Log(actionTaken[0]);
+        //Debug.Log(actionTaken[0]);
 
         float actionSpeed = (actionTaken[0] + 1) / 2; // [0, +1]
         float actionSteering = actionTaken[1]; // [-1, +1]
 
-        Debug.Log("speed: " + actionSpeed);
-        Debug.Log("actionSteering: " + actionSteering);
+        if (actionSpeed == 0)
+        {
+            AddReward(-10);
+        }
+        //Debug.Log("speed: " + actionSpeed);
+        //Debug.Log("actionSteering: " + actionSteering);
         transform.Translate(actionSpeed * Vector3.forward * speed * Time.deltaTime);
         transform.rotation = Quaternion.Euler(new Vector3(0, actionSteering * 180, 0));
 
@@ -75,15 +97,38 @@ public class MyAgent : Agent
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("trigger: "+other.tag);
+        //Debug.Log("trigger: "+other.tag);
         if (other.tag == "Wall") {
-            AddReward(-100);
+            AddReward(-1000);
             EndEpisode();
         }
         if (other.tag == "City")
         {
             Debug.Log("Itt van");
+            AddReward(5000);
+        }
+        if (other.tag == "Route")
+        {
+            //Debug.Log("hahj");
+            AddReward(100);
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.tag == "Route")
+        {
+            //Debug.Log("ahj");
             AddReward(10);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.tag == "Route")
+        {
+            //Debug.Log("jaj");
+            AddReward(-100);
         }
     }
 }

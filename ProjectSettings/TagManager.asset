@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Wall
   - City
+  - Route
   layers:
   - Default
   - TransparentFX
