@@ -7,7 +7,7 @@ using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
 
-public class MyAgent : Agent
+public class MyAgentNew : Agent
 {
     Rigidbody rigidBody;
     public float speed = 100;
@@ -17,18 +17,23 @@ public class MyAgent : Agent
     public GameObject City4;
     public GameObject City5;
 
-    
+   
 
 
     // Start is called before the first frame update
     void Start()
     {
-       
+        
     }
     public override void CollectObservations(VectorSensor sensor)
     {
-        // The position of the agent
-        sensor.AddObservation(transform.localPosition);
+        int numberOfChildren = transform.childCount;
+
+        for (int i = 0; i < numberOfChildren; i++)
+        {
+            // The position of the agents
+            sensor.AddObservation(transform.GetChild(i).localPosition);
+        }
 
         sensor.AddObservation(City1.transform.localPosition.x);
         sensor.AddObservation(City1.transform.localPosition.z);
@@ -90,20 +95,45 @@ public class MyAgent : Agent
 
     public override void OnActionReceived(ActionBuffers actions)
     {
+        int numberOfChildren = transform.childCount;
+
         var actionTaken = actions.ContinuousActions;
         //Debug.Log(actionTaken[0]);
+        float[] actionSpeed = new float[3];
+        float[] actionSteering = new float[3];
 
-        float actionSpeed = (actionTaken[0] + 1) / 2; // [0, +1]
-        float actionSteering = actionTaken[1]; // [-1, +1]
+        for (int i = 0; i < numberOfChildren; i++)
+        {
+            actionSpeed[i] = (actionTaken[i*2] + 1) / 2; // [0, +1]
+            actionSteering[i] = actionTaken[i*2+1];
+        }
+            float actionSpeed1 = (actionTaken[0] + 1) / 2; // [0, +1]
+        float actionSteering1 = actionTaken[1]; // [-1, +1]
 
-        if (actionSpeed == 0)
+       /* if (actionSpeed[1] == 0)
         {
             AddReward(-10);
         }
+        if (actionSpeed[2] == 0)
+        {
+            AddReward(-10);
+        }
+        if (actionSpeed[0] == 0)
+        {
+            AddReward(-10);
+        }*/
+
+        
+
+        for (int i = 0; i < numberOfChildren; i++)
+        {
+            transform.GetChild(i).Translate(actionSpeed[i] * Vector3.forward * speed * Time.deltaTime);
+            transform.rotation = Quaternion.Euler(new Vector3(0, actionSteering[i] * 180, 0));
+        }
         //Debug.Log("speed: " + actionSpeed);
         //Debug.Log("actionSteering: " + actionSteering);
-        transform.Translate(actionSpeed * Vector3.forward * speed * Time.deltaTime);
-        transform.rotation = Quaternion.Euler(new Vector3(0, actionSteering * 180, 0));
+        //transform.Translate(actionSpeed * Vector3.forward * speed * Time.deltaTime);
+        //transform.rotation = Quaternion.Euler(new Vector3(0, actionSteering * 180, 0));
 
         AddReward(-0.01f);
     }
@@ -163,3 +193,4 @@ public class MyAgent : Agent
         }
     }
 }
+

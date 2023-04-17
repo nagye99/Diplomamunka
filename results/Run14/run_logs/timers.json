@@ -1,0 +1,42 @@
+{
+    "name": "root",
+    "metadata": {
+        "timer_format_version": "0.1.0",
+        "start_time_seconds": "1681723767",
+        "python_version": "3.7.16 (default, Jan 17 2023, 16:06:28) [MSC v.1916 64 bit (AMD64)]",
+        "command_line_arguments": "D:\\Programok\\anaconda3\\envs\\unity\\Scripts\\mlagents-learn Training\\Trucks.yaml --run-id=Run14",
+        "mlagents_version": "0.28.0",
+        "mlagents_envs_version": "0.28.0",
+        "communication_protocol_version": "1.5.0",
+        "pytorch_version": "1.7.1+cu110",
+        "numpy_version": "1.21.6",
+        "end_time_seconds": "1681723810"
+    },
+    "total": 42.8493862,
+    "count": 1,
+    "self": 0.14464429999999595,
+    "children": {
+        "run_training.setup": {
+            "total": 0.3653928999999998,
+            "count": 1,
+            "self": 0.3653928999999998
+        },
+        "TrainerController.start_learning": {
+            "total": 42.339349,
+            "count": 1,
+            "self": 0.00022599999999783904,
+            "children": {
+                "TrainerController._reset_env": {
+                    "total": 42.339075,
+                    "count": 1,
+                    "self": 42.339075
+                },
+                "TrainerController._save_models": {
+                    "total": 4.7999999999603915e-05,
+                    "count": 1,
+                    "self": 4.7999999999603915e-05
+                }
+            }
+        }
+    }
+}
