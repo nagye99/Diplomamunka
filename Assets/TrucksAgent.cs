@@ -35,15 +35,22 @@ public class TrucksAgent : Agent
     (GameObject Start, GameObject Finish) utvonal19;
     (GameObject Start, GameObject Finish) utvonal20;
 
+    GameObject choosenCity;
+
+    Vector3[] truckTranslation = { new Vector3(0, 0, 0), new Vector3(15, 0, 0), new Vector3(-15, 0, 0) };
+    List<List<float>> distances = new List<List<float>>();
+
     private ArrayList cities;
 
     private int numberOfChildren;
+    private List<int> currentPosition;
+
+    List<(GameObject, GameObject)> Goal;
 
     // Start is called before the first frame update
     void Start()
     {
         cities = new ArrayList() { City1, City2, City3, City4, City5, Telephely };
-        numberOfChildren = transform.childCount;
 
         utvonal1 = (City1, City2);
         utvonal2 = (City1, City3);
@@ -65,34 +72,70 @@ public class TrucksAgent : Agent
         utvonal18 = (City5, City2);
         utvonal19 = (City5, City3);
         utvonal20 = (City5, City4);
+
+        for (int i = 0; i < 6; i++)
+        {
+            var varosonkent = new List<float>();
+            for (int j = 0; j < 6; j++)
+            {
+                GameObject indulasi = (GameObject)cities[i];
+                GameObject erkezesi = (GameObject)cities[j];
+                varosonkent.Add(Vector3.Distance(indulasi.transform.localPosition, erkezesi.transform.localPosition));
+            }
+            distances.Add(varosonkent);
+        }
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
+        numberOfChildren = transform.childCount;
+
         for (int i = 0; i < numberOfChildren; i++)
         {
             // The position of the agents
             sensor.AddObservation(transform.GetChild(i).localPosition);
         }
+        for (int i = 0; i < 6; i++)
+        {
+            sensor.AddObservation(distances[i]);
+        }
     }
 
     public override void OnEpisodeBegin()
     {
+        Goal = new List<(GameObject, GameObject)>()
+        {
+            utvonal1, utvonal1, utvonal1, utvonal1, utvonal1,
+            utvonal2, utvonal2, utvonal5, utvonal5, utvonal5,
+            utvonal7, utvonal7, utvonal8, utvonal9, utvonal9,
+            utvonal9, utvonal9, utvonal12, utvonal13, utvonal13,
+            utvonal13, utvonal14, utvonal15, utvonal15, utvonal16,
+            utvonal17, utvonal19, utvonal19, utvonal19, utvonal20
+        };
+        //Debug.Log("a");
         transform.GetChild(0).localPosition = new Vector3(0, 0, 0);
         transform.GetChild(1).localPosition = new Vector3(30, 0, 0);
         transform.GetChild(2).localPosition = new Vector3(-30, 0, 0);
+        currentPosition = new List<int>() { 5, 5, 5 };
     }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        var discreteActions = actions.DiscreteActions;
-
         numberOfChildren = transform.childCount;
 
-        for (int i = 0; i < numberOfChildren; i++)
+        var discreteActions = actions.DiscreteActions;
+
+        for (int i = 0; i < numberOfChildren; i++) 
         {
-            var choosenCity = (GameObject)cities[discreteActions[i]];
-            transform.GetChild(i).localPosition = new Vector3(choosenCity.transform.localPosition.x, 0, choosenCity.transform.localPosition.z);
+            //Debug.Log(discreteActions[i]);
+
+            choosenCity = (GameObject)cities[discreteActions[i]];
+            var cityLocalPosition = choosenCity.transform.localPosition;
+            transform.GetChild(i).localPosition = new Vector3(cityLocalPosition.x, cityLocalPosition.y, cityLocalPosition.z) + truckTranslation[i];
+
+            CalculateReward(currentPosition[i], discreteActions[i]);
+
+            currentPosition[i] = discreteActions[i];
         }
     }
 
@@ -123,6 +166,45 @@ public class TrucksAgent : Agent
         if (Input.GetKey("e"))
         {
             discreteActions[0] = 4;
+        }
+    }
+
+    public override void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
+    {
+    }
+
+    public void CalculateReward(int start, int arrival)
+    {
+        //Debug.Log(start + " " + arrival);
+        //Debug.Log(-1*distances[start][arrival]);
+        AddReward(-1 * distances[start][arrival]);
+
+        var utvonal = ((GameObject)cities[start], (GameObject)cities[arrival]);
+
+        if (Goal.Count > 0 && arrival == 5)
+        {
+            //Debug.Log(-100);
+            AddReward(-100);
+        }
+
+        if (start == arrival)
+        {
+
+            //Debug.Log(-10);
+            AddReward(-10000);
+        }
+
+        if (Goal.Contains(utvonal))
+        {
+
+            //Debug.Log(750);
+            AddReward(1000);
+            Goal.Remove(utvonal);
+        }
+
+        if (Goal.Count <= 0)
+        {
+            EndEpisode();
         }
     }
 }

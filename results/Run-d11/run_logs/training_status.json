@@ -1,0 +1,29 @@
+{
+    "TrucksBehavior": {
+        "checkpoints": [
+            {
+                "steps": 71520,
+                "file_path": "results\\Run-d11\\TrucksBehavior\\TrucksBehavior-71520.onnx",
+                "reward": null,
+                "creation_time": 1681865373.280322,
+                "auxillary_file_paths": [
+                    "results\\Run-d11\\TrucksBehavior\\TrucksBehavior-71520.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 71520,
+            "file_path": "results\\Run-d11\\TrucksBehavior.onnx",
+            "reward": null,
+            "creation_time": 1681865373.280322,
+            "auxillary_file_paths": [
+                "results\\Run-d11\\TrucksBehavior\\TrucksBehavior-71520.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.28.0",
+        "torch_version": "1.7.1+cu110"
+    }
+}
