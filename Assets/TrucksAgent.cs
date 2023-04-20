@@ -137,6 +137,16 @@ public class TrucksAgent : Agent
 
             currentPosition[i] = discreteActions[i];
         }
+
+        if (Goal.Count <= 0)
+        {
+            /*if (currentPosition[0] == 5 && currentPosition[1] == 5 && currentPosition[2] == 5)
+            {
+                EndEpisode();
+            }*/
+            EndEpisode();
+        }
+
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -181,30 +191,29 @@ public class TrucksAgent : Agent
 
         var utvonal = ((GameObject)cities[start], (GameObject)cities[arrival]);
 
-        if (Goal.Count > 0 && arrival == 5)
+        /*if (Goal.Count > 0 && arrival == 5)
         {
             //Debug.Log(-100);
             AddReward(-100);
         }
+        if (Goal.Count <= 0 && arrival == 5)
+        {
+            AddReward(100);
+        }*/
 
         if (start == arrival)
         {
 
             //Debug.Log(-10);
-            AddReward(-10000);
+            AddReward(-100);
         }
 
         if (Goal.Contains(utvonal))
         {
 
-            //Debug.Log(750);
+            ///Debug.Log(750);
             AddReward(1000);
             Goal.Remove(utvonal);
-        }
-
-        if (Goal.Count <= 0)
-        {
-            EndEpisode();
         }
     }
 }
