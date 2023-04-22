@@ -4,9 +4,13 @@ using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
+using System;
 
 public class TrucksAgent : Agent
 {
+    public int elteres = 0;
+    static int sorszam = 1; //0;
+
     public GameObject City1;
     public GameObject City2;
     public GameObject City3;
@@ -14,26 +18,21 @@ public class TrucksAgent : Agent
     public GameObject City5;
     public GameObject Telephely;
 
-    (GameObject Start, GameObject Finish) utvonal1;
-    (GameObject Start, GameObject Finish) utvonal2;
-    (GameObject Start, GameObject Finish) utvonal3;
-    (GameObject Start, GameObject Finish) utvonal4;
-    (GameObject Start, GameObject Finish) utvonal5;
-    (GameObject Start, GameObject Finish) utvonal6;
-    (GameObject Start, GameObject Finish) utvonal7;
-    (GameObject Start, GameObject Finish) utvonal8;
-    (GameObject Start, GameObject Finish) utvonal9;
-    (GameObject Start, GameObject Finish) utvonal10;
-    (GameObject Start, GameObject Finish) utvonal11;
-    (GameObject Start, GameObject Finish) utvonal12;
-    (GameObject Start, GameObject Finish) utvonal13;
-    (GameObject Start, GameObject Finish) utvonal14;
-    (GameObject Start, GameObject Finish) utvonal15;
-    (GameObject Start, GameObject Finish) utvonal16;
-    (GameObject Start, GameObject Finish) utvonal17;
-    (GameObject Start, GameObject Finish) utvonal18;
-    (GameObject Start, GameObject Finish) utvonal19;
-    (GameObject Start, GameObject Finish) utvonal20;
+    (int Start, int Finish) utvonal1;
+    (int Start, int Finish) utvonal2;
+    (int Start, int Finish) utvonal3;
+    (int Start, int Finish) utvonal4;
+    (int Start, int Finish) utvonal5;
+    (int Start, int Finish) utvonal6;
+    (int Start, int Finish) utvonal7;
+    (int Start, int Finish) utvonal8;
+    (int Start, int Finish) utvonal9;
+    (int Start, int Finish) utvonal10;
+    (int Start, int Finish) utvonal11;
+    (int Start, int Finish) utvonal12;
+    (int Start, int Finish) utvonal13;
+    (int Start, int Finish) utvonal14;
+
 
     GameObject choosenCity;
 
@@ -45,33 +44,28 @@ public class TrucksAgent : Agent
     private int numberOfChildren;
     private List<int> currentPosition;
 
-    List<(GameObject, GameObject)> Goal;
+    //List<(GameObject, GameObject)> goals_old;
+    List<(int, int)> goals_num = new List<(int, int)>();
 
-    // Start is called before the first frame update
     void Start()
     {
         cities = new ArrayList() { City1, City2, City3, City4, City5, Telephely };
 
-        utvonal1 = (City1, City2);
-        utvonal2 = (City1, City3);
-        utvonal3 = (City1, City4);
-        utvonal4 = (City1, City5);
-        utvonal5 = (City2, City1);
-        utvonal6 = (City2, City3);
-        utvonal7 = (City2, City4);
-        utvonal8 = (City2, City5);
-        utvonal9 = (City3, City1);
-        utvonal10 = (City3, City2);
-        utvonal11 = (City3, City4);
-        utvonal12 = (City3, City5);
-        utvonal13 = (City4, City1);
-        utvonal14 = (City4, City2);
-        utvonal15 = (City4, City3);
-        utvonal16 = (City4, City5);
-        utvonal17 = (City5, City1);
-        utvonal18 = (City5, City2);
-        utvonal19 = (City5, City3);
-        utvonal20 = (City5, City4);
+        
+        utvonal1 = (0, 3);
+        utvonal2 = (0, 4);
+        utvonal3 = (1, 2);
+        utvonal4 = (1, 3);
+        utvonal5 = (1, 4);
+        utvonal6 = (2, 1);
+        utvonal7 = (2, 4);
+        utvonal8 = (3, 0);
+        utvonal9 = (3, 1);
+        utvonal10 = (3, 4);
+        utvonal11 = (4, 0);
+        utvonal12 = (4, 1);
+        utvonal13 = (4, 2);
+        utvonal14 = (4, 3);
 
         for (int i = 0; i < 6; i++)
         {
@@ -92,27 +86,27 @@ public class TrucksAgent : Agent
 
         for (int i = 0; i < numberOfChildren; i++)
         {
-            // The position of the agents
-            sensor.AddObservation(transform.GetChild(i).localPosition);
+            sensor.AddObservation(currentPosition[i]);
         }
         for (int i = 0; i < 6; i++)
         {
             sensor.AddObservation(distances[i]);
         }
+        foreach (var goal in goals_num)
+        {
+            sensor.AddObservation(goal.Item1);
+            sensor.AddObservation(goal.Item2);
+        }
     }
 
     public override void OnEpisodeBegin()
     {
-        Goal = new List<(GameObject, GameObject)>()
+        goals_num = new List<(int, int)>();
+        for (int i = 0; i < 15; i++)
         {
-            utvonal1, utvonal1, utvonal1, utvonal1, utvonal1,
-            utvonal2, utvonal2, utvonal5, utvonal5, utvonal5,
-            utvonal7, utvonal7, utvonal8, utvonal9, utvonal9,
-            utvonal9, utvonal9, utvonal12, utvonal13, utvonal13,
-            utvonal13, utvonal14, utvonal15, utvonal15, utvonal16,
-            utvonal17, utvonal19, utvonal19, utvonal19, utvonal20
-        };
-        //Debug.Log("a");
+            goals_num.Add(GenerateSzallitmany());
+        }
+
         transform.GetChild(0).localPosition = new Vector3(0, 0, 0);
         transform.GetChild(1).localPosition = new Vector3(30, 0, 0);
         transform.GetChild(2).localPosition = new Vector3(-30, 0, 0);
@@ -127,8 +121,6 @@ public class TrucksAgent : Agent
 
         for (int i = 0; i < numberOfChildren; i++) 
         {
-            //Debug.Log(discreteActions[i]);
-
             choosenCity = (GameObject)cities[discreteActions[i]];
             var cityLocalPosition = choosenCity.transform.localPosition;
             transform.GetChild(i).localPosition = new Vector3(cityLocalPosition.x, cityLocalPosition.y, cityLocalPosition.z) + truckTranslation[i];
@@ -138,12 +130,8 @@ public class TrucksAgent : Agent
             currentPosition[i] = discreteActions[i];
         }
 
-        if (Goal.Count <= 0)
+        if (goals_num.Count <= 0)
         {
-            /*if (currentPosition[0] == 5 && currentPosition[1] == 5 && currentPosition[2] == 5)
-            {
-                EndEpisode();
-            }*/
             EndEpisode();
         }
 
@@ -181,39 +169,158 @@ public class TrucksAgent : Agent
 
     public override void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
     {
+        for (int i = 0; i < 3; i++)
+        {
+            if (currentPosition[i] == 0)
+            {
+                actionMask.SetActionEnabled(i, 1, false);
+                actionMask.SetActionEnabled(i, 2, false);
+            }
+            if (currentPosition[i] == 1)
+            {
+                actionMask.SetActionEnabled(i, 0, false);
+            }
+            if (currentPosition[i] == 2)
+            {
+                actionMask.SetActionEnabled(i, 0, false);
+                actionMask.SetActionEnabled(i, 3, false);
+            }
+            if (currentPosition[i] == 3)
+            {
+                actionMask.SetActionEnabled(i, 2, false);
+            }
+        }
     }
 
-    public void CalculateReward(int start, int arrival)
+    private void CalculateReward(int start, int arrival)
     {
-        //Debug.Log(start + " " + arrival);
-        //Debug.Log(-1*distances[start][arrival]);
         AddReward(-1 * distances[start][arrival]);
 
-        var utvonal = ((GameObject)cities[start], (GameObject)cities[arrival]);
-
-        /*if (Goal.Count > 0 && arrival == 5)
-        {
-            //Debug.Log(-100);
-            AddReward(-100);
-        }
-        if (Goal.Count <= 0 && arrival == 5)
-        {
-            AddReward(100);
-        }*/
+        var utvonal = (start, arrival);
 
         if (start == arrival)
         {
-
-            //Debug.Log(-10);
             AddReward(-100);
         }
 
-        if (Goal.Contains(utvonal))
+        if (goals_num.Contains(utvonal))
         {
-
-            ///Debug.Log(750);
             AddReward(1000);
-            Goal.Remove(utvonal);
+            goals_num.Remove(utvonal);
+            goals_num.Add(GenerateSzallitmany());
+        }
+    }
+
+    private (int, int) GenerateSzallitmany()
+    {
+        var rnd = new System.Random();
+        //if (elteres == 0 || 15 - elteres > sorszam)
+        if (elteres == 0 || sorszam % elteres != 0)
+        {
+            sorszam++;
+            if (elteres != 0) {
+                sorszam = sorszam % elteres;
+            }
+
+            var valasztas = rnd.Next(100);
+
+            if (valasztas < 9)
+            {
+                return utvonal1;
+            }
+            else if (valasztas < 16)
+            {
+                return utvonal2;
+            }
+            else if (valasztas < 29)
+            {
+                return utvonal3;
+            }
+            else if (valasztas < 32)
+            {
+                return utvonal4;
+            }
+            else if (valasztas < 41)
+            {
+                return utvonal5;
+            }
+            else if (valasztas < 46)
+            {
+                return utvonal6;
+            }
+            else if (valasztas < 51)
+            {
+                return utvonal7;
+            }
+            else if (valasztas < 68)
+            {
+                return utvonal8;
+            }
+            else if (valasztas < 72)
+            {
+                return utvonal9;
+            }
+            else if (valasztas < 77)
+            {
+                return utvonal10;
+            }
+            else if (valasztas < 86)
+            {
+                return utvonal11;
+            }
+            else if (valasztas < 90)
+            {
+                return utvonal12;
+            }
+            else if (valasztas < 94)
+            {
+                return utvonal13;
+            }
+            else
+            {
+                return utvonal14;
+            }
+        }
+        else
+        {
+            /*sorszam++;
+            sorszam = sorszam % 15;*/
+            sorszam = 1;
+            var valasztott = rnd.Next(14);
+
+            switch (valasztott)
+            {
+                case 0:
+                    return utvonal1;
+                case 1:
+                    return utvonal2;
+                case 2:
+                    return utvonal3;
+                case 3:
+                    return utvonal4;
+                case 4:
+                    return utvonal5;
+                case 5:
+                    return utvonal6;
+                case 6:
+                    return utvonal7;
+                case 7:
+                    return utvonal8;
+                case 8:
+                    return utvonal9;
+                case 9:
+                    return utvonal10;
+                case 10:
+                    return utvonal11;
+                case 11:
+                    return utvonal12;
+                case 12:
+                    return utvonal13;
+                case 13:
+                    return utvonal14;
+                default:
+                    return utvonal14;
+            }
         }
     }
 }

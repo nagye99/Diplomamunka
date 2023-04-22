@@ -2,7 +2,7 @@ behaviors:
   TrucksBehavior:
     trainer_type: ppo
     time_horizon: 128
-    max_steps: 1e6
+    max_steps: 750000
     hyperparameters:
       learning_rate: 1e-2
       batch_size: 256
@@ -22,7 +22,7 @@ behaviors:
        network_settings:
          hidden_units: 256
        learning_rate: 0.0003
-    summary_freq: 50000
+    summary_freq: 10000
     threaded: true
 torch_settings:
   device: cpu

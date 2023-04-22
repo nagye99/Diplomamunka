@@ -1,0 +1,47 @@
+{
+    "TrucksBehavior": {
+        "checkpoints": [
+            {
+                "steps": 499928,
+                "file_path": "results\\NEWRun2\\TrucksBehavior\\TrucksBehavior-499928.onnx",
+                "reward": -97641.9299778294,
+                "creation_time": 1682068600.0429611,
+                "auxillary_file_paths": [
+                    "results\\NEWRun2\\TrucksBehavior\\TrucksBehavior-499928.pt"
+                ]
+            },
+            {
+                "steps": 999928,
+                "file_path": "results\\NEWRun2\\TrucksBehavior\\TrucksBehavior-999928.onnx",
+                "reward": -84339.81820974042,
+                "creation_time": 1682071627.2127113,
+                "auxillary_file_paths": [
+                    "results\\NEWRun2\\TrucksBehavior\\TrucksBehavior-999928.pt"
+                ]
+            },
+            {
+                "steps": 1002560,
+                "file_path": "results\\NEWRun2\\TrucksBehavior\\TrucksBehavior-1002560.onnx",
+                "reward": -84364.7161640625,
+                "creation_time": 1682071643.438108,
+                "auxillary_file_paths": [
+                    "results\\NEWRun2\\TrucksBehavior\\TrucksBehavior-1002560.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 1002560,
+            "file_path": "results\\NEWRun2\\TrucksBehavior.onnx",
+            "reward": -84364.7161640625,
+            "creation_time": 1682071643.438108,
+            "auxillary_file_paths": [
+                "results\\NEWRun2\\TrucksBehavior\\TrucksBehavior-1002560.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.28.0",
+        "torch_version": "1.7.1+cu110"
+    }
+}
