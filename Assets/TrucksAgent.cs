@@ -74,6 +74,7 @@ public class TrucksAgent : Agent
             {
                 GameObject indulasi = (GameObject)cities[i];
                 GameObject erkezesi = (GameObject)cities[j];
+                
                 varosonkent.Add(Vector3.Distance(indulasi.transform.localPosition, erkezesi.transform.localPosition));
             }
             distances.Add(varosonkent);
